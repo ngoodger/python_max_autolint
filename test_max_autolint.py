@@ -78,9 +78,7 @@ class TestAutoLint():
     def mock_flake8(files):
         TestAutoLint.mock_checker(files, "flake8")
 
-        
-    def test_max_autolint(self,test_files):
-
+    def test_check(self,test_files):
         test_type= "unit"
         if test_type == "unit":
 
@@ -111,6 +109,20 @@ class TestAutoLint():
             if len(file.checker_errors) > 0:
                 assert(not file.good), "Presence of checker errors indicates bad file."
 
+    def test_modify(self, test_files):
+        test_type= "unit"
+        if test_type == "unit":
+
+            autolinter = max_autolint.MaxAutolint()
+            autolinter.modifiers=[TestAutoLint.mock_black, TestAutoLint.mock_isort]
+            autolinter.checkers=[TestAutoLint.mock_flake8]
+            autolinter.syntax=TestAutoLint.mock_syntax
+
+        else:
+            raise NotImplemented
+
+        autolinter.check_syntax(test_files)
+        autolinter.check(test_files)
         autolinter.modify(test_files)
         for _, file in test_files.items():
             assert(not "isort" in file.checker_errors), "Black should be resolved."
