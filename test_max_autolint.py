@@ -36,21 +36,38 @@ class TestAutoLint():
     @staticmethod
     def mock_modifier(files, name, check=False,):
         for _, file in files.items():
-            if name in file.checker_errors_present:
-                if check:
-                    file.checker_errors.add(name)
-                else:
+            if not file.syntax_error_present:
+                if name in file.checker_errors_present:
                     if name in file.checker_errors:
                         file.checker_errors.remove(name)
                     file.checker_no_errors.add(name)
+                    file.modifier_applied.add(name)
+            else:
+                file.modifier_failures.add(name)
+
+    def mock_checker(files, name):
+        for _, file in files.items():
+            if not file.syntax_error_present:
+                if name in file.checker_errors_present:
+                    file.checker_errors.add(name)
+                else:
+                    file.checker_no_errors.add(name)
+            else:
+                file.checker_failures.add(name)
 
     @staticmethod
     def mock_black(files, check=False):
-        TestAutoLint.mock_modifier(files, "black", check=check,)
+        if check:
+            TestAutoLint.mock_checker(files, "black")
+        else:
+            TestAutoLint.mock_modifier(files, "black")
 
     @staticmethod
     def mock_isort(files, check=False):
-        TestAutoLint.mock_modifier(files, "isort", check=check,)
+        if check:
+            TestAutoLint.mock_checker(files, "isort")
+        else:
+            TestAutoLint.mock_modifier(files, "isort")
 
     @staticmethod
     def mock_syntax(files):
@@ -59,16 +76,12 @@ class TestAutoLint():
 
     @staticmethod
     def mock_flake8(files):
-        for _, file in files.items():
-            if "flake8" in file.checker_errors_present:
-                file.checker_errors.add("flake8")
+        TestAutoLint.mock_checker(files, "flake8")
 
         
     def test_max_autolint(self,test_files):
 
         test_type= "unit"
-
-
         if test_type == "unit":
 
             autolinter = max_autolint.MaxAutolint()
@@ -77,7 +90,7 @@ class TestAutoLint():
             autolinter.syntax=TestAutoLint.mock_syntax
 
         else:
-            pass
+            raise NotImplemented
 
         autolinter.check_syntax(test_files)
         autolinter.check(test_files)
@@ -86,8 +99,8 @@ class TestAutoLint():
         for _, file in test_files.items():
             if file.syntax_error_present:
                 assert(file.syntax_error), "File with syntax error should be detected"
-                #assert(file.checker_failures
-                #       == file.checkers), "All checkers should fail due to syntax error."
+                assert(file.checker_failures
+                       == {"black", "isort", "flake8"}), "All checkers should fail due to syntax error."
                 #assert(file.modifier_failures
                 #       == autolinter.modifiers), "All modifiers should fail due to syntax error."
             else:
@@ -103,11 +116,16 @@ class TestAutoLint():
             assert(not "isort" in file.checker_errors), "Black should be resolved."
             if "black" in file.checker_errors_present:
                 assert(not "black" in file.checker_errors), "Black should be resolved."
-                assert(not "black" in file.modifier_applied), "Black should be listed in modifiers applied."
+                assert("black" in file.modifier_applied), "Black should be listed in modifiers applied."
             if "isort" in file.checker_errors_present:
                 assert(not "isort" in file.checker_errors), "Isort should be resolved."
-                assert(not "isort" in file.modifier_applied), "Isort should be listed in modifiers applied."
+                assert("isort" in file.modifier_applied), "Isort should be listed in modifiers applied."
             if file.syntax_error_present or "flake8" in file.checker_errors:
                 assert(not file.good), "Checker errors should not be resolvable."
             else:
                 assert(file.good), "Checker errors should be resolved."
+            if file.syntax_error_present:
+                assert(file.checker_failures
+                       == {"black", "isort", "flake8"}), "All checkers should fail due to syntax error."
+                assert(file.modifier_failures
+                       == {"black", "isort"}), "All modifiers should fail due to syntax error."
