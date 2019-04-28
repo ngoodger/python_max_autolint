@@ -100,8 +100,8 @@ class Syntax(Checker):
 class MaxAutolint(object):
 
     def __init__(self):
-        #self._modifiers=[Isort(), Black()]
-        #self._checkers=[Flake8]
+        #self._modifiers={Isort(), Black()}
+        #self._checkers={Flake8}
         self._syntax=Syntax
 
     def check_syntax(self, files):
@@ -109,13 +109,13 @@ class MaxAutolint(object):
 
     def check_good(self, files):
         for _, file in files.items():
-            file.good = not file.syntax_error and len(file.checker_errors) == 0
+            syntax_error_checked = file.syntax_error is not None
+            all_checkers_run_no_errors = len(self.checkers) == len(file.checker_no_errors)
+            file.good = syntax_error_checked and all_checkers_run_no_errors
         
     def check(self, files):
         for checker in self._checkers:
             checker(files)
-        for modifier in self._modifiers:
-            modifier(files, check=True)
         self.check_good(files)
 
     def modify(self, files):
