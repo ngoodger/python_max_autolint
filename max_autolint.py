@@ -109,7 +109,7 @@ class MaxAutolint(object):
 
     def check_good(self, files):
         for _, file in files.items():
-            file.good = len(file.checker_errors) == 0
+            file.good = not file.syntax_error and len(file.checker_errors) == 0
         
     def check(self, files):
         for checker in self._checkers:
