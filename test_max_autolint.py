@@ -7,16 +7,16 @@ from abc import ABC, abstractmethod
 # Syntax error causes all checkers to fail
 @pytest.fixture
 def test_files():
-    files = {"file_0":max_autolint.File(syntax_error=None, good=False, checker_failures=set(),
+    files = {"file_0":max_autolint.File(path="file_0", syntax_error=None, good=False, checker_failures=set(),
                            checker_errors=set(), checker_no_errors=set(), 
                            modifier_failures=set(), modifier_applied=set()),  
-             "file_1":max_autolint.File(syntax_error=None, good=False, checker_failures=set(),
+             "file_1":max_autolint.File(path="file_1", syntax_error=None, good=False, checker_failures=set(),
                            checker_errors=set(), checker_no_errors=set(), 
                            modifier_failures=set(), modifier_applied=set()),  
-             "file_2":max_autolint.File(syntax_error=None, good=False, checker_failures=set(),
+             "file_2":max_autolint.File(path="file_2", syntax_error=None, good=False, checker_failures=set(),
                            checker_errors=set(), checker_no_errors=set(), 
                            modifier_failures=set(), modifier_applied=set()),  
-             "file_3":max_autolint.File(syntax_error=None, good=False, checker_failures=set(),
+             "file_3":max_autolint.File(path="file_3", syntax_error=None, good=False, checker_failures=set(),
                            checker_errors=set(), checker_no_errors=set(), 
                            modifier_failures=set(), modifier_applied=set()),  
             }

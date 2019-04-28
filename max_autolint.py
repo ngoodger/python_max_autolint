@@ -5,13 +5,14 @@ from typing import Dict
 
 @dataclass
 class File:
-    syntax_error: bool
-    good: bool
     checker_failures: set
     checker_errors: set
     checker_no_errors: set
     modifier_applied: set
     modifier_failures: set
+    path: str
+    syntax_error: bool=None
+    good: bool=False
 
 def check_error(file):
     pass
@@ -40,7 +41,11 @@ class FileOperator(ABC):
         pass
 
     @abstractmethod
-    def update_file_properties(self):
+    def out_update_file_properties(self):
+        pass
+
+    @abstractmethod
+    def err_update_file_properties(self):
         pass
 
 class Modifier(ABC):
@@ -62,7 +67,8 @@ class Black(FileOperator):
     ERROR_INDICATOR_STRING = "error: cannot format "
     ERROR_START_FILE_IDX = len(ERROR_INDICATOR_STRING) 
 
-    def  __init__(self):
+    def  __init__(self, files):
+        super(Black, self).__init__(files)
         self._base_cmd =["black", "--check"]
 
     @property
