@@ -34,6 +34,17 @@ class FileOperator(ABC):
             self.err_update_file_properties(err)
         return proc_done
 
+    @staticmethod
+    def get_filenames_of_interest(indicator_string: str, input_string: str):
+        print("get_filenames_of_interest")
+        print(input_string)
+        input_lines = input_string.splitlines()
+        print(input_lines)
+        input_lines = (line for line in input_lines if indicator_string in line)
+        filenames = (input_line[len(indicator_string):] for
+                                 input_line in input_lines)
+        return filenames
+
     @property
     @abstractmethod
     def base_cmd(self):
@@ -65,38 +76,38 @@ class Black(FileOperator):
     REFORMAT_START_FILE_IDX = len(REFORMAT_INDICATOR_STRING) 
     ERROR_INDICATOR_STRING = "error: cannot format "
     ERROR_START_FILE_IDX = len(ERROR_INDICATOR_STRING) 
+    WOULD_REFORMAT_INDICATOR_STRING = "would reformat "
+    WOULD_REFORMAT_START_FILE_IDX = len(WOULD_REFORMAT_INDICATOR_STRING) 
 
-    def  __init__(self, files):
+    def  __init__(self, files: str, modifier: bool):
         super(Black, self).__init__(files)
-        self._base_cmd =["black"]
+        self.modifier = modifier
+        if self.modifier:
+            self._base_cmd =["black"]
+        else:
+            self._base_cmd =["black", "--check"]
+            
 
     @property
     def base_cmd(self):
         return self._base_cmd 
 
-    def get_filenames_of_interest(self, indicator_string: str, input_string: str):
-        print("get_filenames_of_interest")
-        print(input_string)
-        input_lines = input_string.splitlines()
-        print(input_lines)
-        input_lines = (line for line in input_lines if indicator_string in line)
-        filenames = list(input_line[len(indicator_string):] for
-                                 input_line in input_lines)
-        return filenames
 
     def out_update_file_properties(self, outs: str):
-        reformatted_filenames = self.get_filenames_of_interest(self.REFORMAT_INDICATOR_STRING, outs)
-        for reformatted_filename in reformatted_filenames:
-            self.files[reformatted_filename].checkers_errors.add(type(self).__name__)
+        pass
 
     def err_update_file_properties(self, err: str):
         error_filenames = self.get_filenames_of_interest(self.ERROR_INDICATOR_STRING, err)
         for error_filename in error_filenames:
             self.files[error_filename].checker_failed.add(type(self).__name__)
-        reformatted_filenames = self.get_filenames_of_interest(self.REFORMAT_INDICATOR_STRING, err)
-        for reformatted_filename in reformatted_filenames:
-            breakpoint()
-            self.files[reformatted_filename].modifier_applied.add(type(self).__name__)
+        if self.modifier:
+            reformatted_filenames = self.get_filenames_of_interest(self.REFORMAT_INDICATOR_STRING, err)
+            for reformatted_filename in reformatted_filenames:
+                self.files[reformatted_filename].modifier_applied.add(type(self).__name__)
+        else:
+            would_reformat_filenames = self.get_filenames_of_interest(self.WOULD_REFORMAT_INDICATOR_STRING, err)
+            for would_reformat_filename in would_reformat_filenames:
+                self.files[would_reformat_filename].checker_errors.add(type(self).__name__)
         
 
 class Isort(Modifier):
