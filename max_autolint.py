@@ -23,16 +23,15 @@ class FileOperator(ABC):
         self.files = files
         
     def __call__(self):
-        file_cmd = self.get_file_cmd(self.files)
-        self.proc = sp.Popen(self.base_cmd + self.files.keys())
+        self.proc = sp.Popen(self.base_cmd + list(self.files.keys()),stdout=sp.PIPE, stderr=sp.PIPE, universal_newlines=True)
 
     def done(self):
         proc_done = not self.proc.poll() is None
         # If process is finished update file properties according to stdout and stderr.
         if proc_done: 
-            proc.communicate()
-            outs, errs = proc.communicate(timeout=15)
-            self.update_file_properties(outs, errs)
+            out, err= self.proc.communicate(timeout=1)
+            self.out_update_file_properties(out)
+            self.err_update_file_properties(err)
         return proc_done
 
     @property
@@ -69,28 +68,35 @@ class Black(FileOperator):
 
     def  __init__(self, files):
         super(Black, self).__init__(files)
-        self._base_cmd =["black", "--check"]
+        self._base_cmd =["black"]
 
     @property
-    def base_cmd():
+    def base_cmd(self):
         return self._base_cmd 
 
-    def get_filenames_of_interest(indicator_string: str, input: str):
-        input_lines = input.splitlines()
+    def get_filenames_of_interest(self, indicator_string: str, input_string: str):
+        print("get_filenames_of_interest")
+        print(input_string)
+        input_lines = input_string.splitlines()
+        print(input_lines)
         input_lines = (line for line in input_lines if indicator_string in line)
-        filenames = (input_line[indicator_string:] for
+        filenames = list(input_line[len(indicator_string):] for
                                  input_line in input_lines)
         return filenames
 
-    def out_update_file_properties(outs: str):
+    def out_update_file_properties(self, outs: str):
         reformatted_filenames = self.get_filenames_of_interest(self.REFORMAT_INDICATOR_STRING, outs)
-        for reformatted_filename in reformatted_filenamess:
-            self.files[reformatted_filename].checkers_errors = type(self).__name__
+        for reformatted_filename in reformatted_filenames:
+            self.files[reformatted_filename].checkers_errors.add(type(self).__name__)
 
-    def err_update_file_properties(err: str):
+    def err_update_file_properties(self, err: str):
         error_filenames = self.get_filenames_of_interest(self.ERROR_INDICATOR_STRING, err)
         for error_filename in error_filenames:
-            self.files[error_filename].checker_failed= type(self).__name__
+            self.files[error_filename].checker_failed.add(type(self).__name__)
+        reformatted_filenames = self.get_filenames_of_interest(self.REFORMAT_INDICATOR_STRING, err)
+        for reformatted_filename in reformatted_filenames:
+            breakpoint()
+            self.files[reformatted_filename].modifier_applied.add(type(self).__name__)
         
 
 class Isort(Modifier):
