@@ -4,15 +4,15 @@ from abc import ABC, abstractmethod
 from typing import Dict
 
 @dataclass
-class File:
+class FileSet:
+    filenames: set
+    all_good: bool=False
     checker_failures: set
     checker_errors: set
     checker_no_errors: set
     modifier_applied: set
     modifier_failures: set
-    path: str
     syntax_error: bool=None
-    good: bool=False
 
 def check_error(file):
     pass
@@ -23,27 +23,27 @@ class FileOperator(ABC):
         self.files = files
         
     def __call__(self):
-        self.proc = sp.Popen(self.base_cmd + list(self.files.keys()),stdout=sp.PIPE, stderr=sp.PIPE, universal_newlines=True)
+        self.proc = sp.Popen(self.base_cmd
+                             + list(self.files.keys()),
+                                    stdout=sp.PIPE, stderr=sp.PIPE, universal_newlines=True)
 
     def done(self):
         proc_done = not self.proc.poll() is None
         # If process is finished update file properties according to stdout and stderr.
         if proc_done: 
-            out, err= self.proc.communicate(timeout=1)
-            self.out_update_file_properties(out)
+            self.std_out, self.std_err= self.proc.communicate(timeout=1)
+            self.return_code = self.proc.returncode
+            self.update_file_properties()
             self.err_update_file_properties(err)
+            self.files[reformatted_filename].modifier_applied.add(type(self).__name__)
         return proc_done
 
     @staticmethod
-    def get_filenames_of_interest(indicator_string: str, input_string: str):
-        print("get_filenames_of_interest")
-        print(input_string)
-        input_lines = input_string.splitlines()
-        print(input_lines)
-        input_lines = (line for line in input_lines if indicator_string in line)
-        filenames = (input_line[len(indicator_string):] for
-                                 input_line in input_lines)
-        return filenames
+
+    @property
+    @abstractmethod
+    def resolvers(self):
+        pass
 
     @property
     @abstractmethod
@@ -70,44 +70,6 @@ class PyAnnotate(Modifier):
 class Mypy(Checker):
     pass
 
-class Black(FileOperator):
-    # Start file path comes after reformatted + space.
-    REFORMAT_INDICATOR_STRING = "reformatted "
-    REFORMAT_START_FILE_IDX = len(REFORMAT_INDICATOR_STRING) 
-    ERROR_INDICATOR_STRING = "error: cannot format "
-    ERROR_START_FILE_IDX = len(ERROR_INDICATOR_STRING) 
-    WOULD_REFORMAT_INDICATOR_STRING = "would reformat "
-    WOULD_REFORMAT_START_FILE_IDX = len(WOULD_REFORMAT_INDICATOR_STRING) 
-
-    def  __init__(self, files: str, modifier: bool):
-        super(Black, self).__init__(files)
-        self.modifier = modifier
-        if self.modifier:
-            self._base_cmd =["black"]
-        else:
-            self._base_cmd =["black", "--check"]
-            
-
-    @property
-    def base_cmd(self):
-        return self._base_cmd 
-
-
-    def out_update_file_properties(self, outs: str):
-        pass
-
-    def err_update_file_properties(self, err: str):
-        error_filenames = self.get_filenames_of_interest(self.ERROR_INDICATOR_STRING, err)
-        for error_filename in error_filenames:
-            self.files[error_filename].checker_failed.add(type(self).__name__)
-        if self.modifier:
-            reformatted_filenames = self.get_filenames_of_interest(self.REFORMAT_INDICATOR_STRING, err)
-            for reformatted_filename in reformatted_filenames:
-                self.files[reformatted_filename].modifier_applied.add(type(self).__name__)
-        else:
-            would_reformat_filenames = self.get_filenames_of_interest(self.WOULD_REFORMAT_INDICATOR_STRING, err)
-            for would_reformat_filename in would_reformat_filenames:
-                self.files[would_reformat_filename].checker_errors.add(type(self).__name__)
         
 
 class Isort(Modifier):

@@ -19,4 +19,3 @@ class GitCollectFileSet():
         diffs = self.repo.index.diff(self.repo.head.commit)
         files = [os.path.join(self.repo.working_dir, diff.a_path) for diff in diffs]
         return files
-
