@@ -3,35 +3,40 @@ import subprocess as sp
 from abc import ABC, abstractmethod
 from typing import Dict
 
+
 @dataclass
 class FileSet:
     filenames: set
-    all_good: bool=False
+    all_good: bool = False
     checker_failures: set
     checker_errors: set
     checker_no_errors: set
     modifier_applied: set
     modifier_failures: set
-    syntax_error: bool=None
+    syntax_error: bool = None
+
 
 def check_error(file):
     pass
 
-class FileOperator(ABC):
 
+class FileOperator(ABC):
     def __init__(self, files: Dict[str, File]):
         self.files = files
-        
+
     def __call__(self):
-        self.proc = sp.Popen(self.base_cmd
-                             + list(self.files.keys()),
-                                    stdout=sp.PIPE, stderr=sp.PIPE, universal_newlines=True)
+        self.proc = sp.Popen(
+            self.base_cmd + list(self.files.keys()),
+            stdout=sp.PIPE,
+            stderr=sp.PIPE,
+            universal_newlines=True,
+        )
 
     def done(self):
         proc_done = not self.proc.poll() is None
         # If process is finished update file properties according to stdout and stderr.
-        if proc_done: 
-            self.std_out, self.std_err= self.proc.communicate(timeout=1)
+        if proc_done:
+            self.std_out, self.std_err = self.proc.communicate(timeout=1)
             self.return_code = self.proc.returncode
             self.update_file_properties()
             self.err_update_file_properties(err)
@@ -39,7 +44,6 @@ class FileOperator(ABC):
         return proc_done
 
     @staticmethod
-
     @property
     @abstractmethod
     def resolvers(self):
@@ -58,36 +62,40 @@ class FileOperator(ABC):
     def err_update_file_properties(self):
         pass
 
+
 class Modifier(ABC):
     pass
+
 
 class Checker(ABC):
     pass
 
+
 class PyAnnotate(Modifier):
     pass
+
 
 class Mypy(Checker):
     pass
 
-        
 
 class Isort(Modifier):
     pass
 
+
 class Flake8(Checker):
     pass
+
 
 class Syntax(Checker):
     pass
 
 
 class MaxAutolint(object):
-
     def __init__(self):
-        #self._modifiers={Isort(), Black()}
-        #self._checkers={Flake8}
-        self._syntax=Syntax
+        # self._modifiers={Isort(), Black()}
+        # self._checkers={Flake8}
+        self._syntax = Syntax
 
     def check_syntax(self, files):
         self._syntax.__call__(files)
@@ -95,9 +103,11 @@ class MaxAutolint(object):
     def check_good(self, files):
         for _, file in files.items():
             syntax_error_checked = file.syntax_error is not None
-            all_checkers_run_no_errors = len(self.checkers) == len(file.checker_no_errors)
+            all_checkers_run_no_errors = len(self.checkers) == len(
+                file.checker_no_errors
+            )
             file.good = syntax_error_checked and all_checkers_run_no_errors
-        
+
     def check(self, files):
         for checker in self._checkers:
             checker(files)
@@ -105,12 +115,12 @@ class MaxAutolint(object):
 
     def modify(self, files):
         for modifier in self._modifiers:
-                modifier(files)
+            modifier(files)
         self.check_good(files)
 
     @property
     def modifiers(self):
-       return self._modifiers 
+        return self._modifiers
 
     @modifiers.setter
     def modifiers(self, new_modifiers):
@@ -118,7 +128,7 @@ class MaxAutolint(object):
 
     @property
     def checkers(self):
-       return self._checkers
+        return self._checkers
 
     @checkers.setter
     def checkers(self, new_checkers):
@@ -126,7 +136,7 @@ class MaxAutolint(object):
 
     @property
     def syntax(self):
-       return self._syntax
+        return self._syntax
 
     @syntax.setter
     def syntax(self, new_syntax):

@@ -1,14 +1,15 @@
 from git import Repo
 import os
 
-class GitCollectFileSet():
+
+class GitCollectFileSet:
     def __init__(self, working_tree_dir):
         """
         Args:
             working_tree_dir (str): project root folder containing .git
         """
         self.repo = Repo(working_tree_dir)
-    
+
     def collect(self):
         """
         Description:
