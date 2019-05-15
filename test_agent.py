@@ -75,10 +75,15 @@ def test_timeit():
 
     timed_test_function = agent.Agent.timeit(test_function)
     return_test = timed_test_function()
-    assert return_test.error == ERROR_VALUE
+
+    assert (
+        return_test.error == ERROR_VALUE
+    ), "Error value should be passed through correctly from timed function."
     # Test time in milliseconds should always be 1 over SLEEP_MS because of function overhead
     # and ceiling function is used to round up.
-    assert math.isclose(return_test.elapsed_time_ms, SLEEP_MS + 1)
+    assert math.isclose(
+        return_test.elapsed_time_ms, SLEEP_MS + 1
+    ), "Execution time measured does not match expected in test."
 
 
 def test_agent_syntax_fail():
@@ -92,6 +97,9 @@ def test_agent_syntax_fail():
 
 
 def test_agent_modifier_fail():
+    """
+    Test agent on file containing modifier_0 error. 
+    """
     test_agent = AgentMockModifierFail()
     TEST_OUT_MODIFIER_FAIL = CallsTruth(
         count=2, order=["syntax", "modifier_0"], arg="test_file.py"
@@ -101,6 +109,9 @@ def test_agent_modifier_fail():
 
 
 def test_agent_checker_fail():
+    """
+    Test agent on file containing checker_0 error. 
+    """
     test_agent = AgentMockCheckerFail()
     TEST_OUT_CHECKER_FAIL = CallsTruth(
         count=4,
@@ -112,6 +123,9 @@ def test_agent_checker_fail():
 
 
 def test_agent_no_fail():
+    """
+    Test agent on file containing no errors. 
+    """
     test_agent = AgentMock()
     TEST_OUT_NO_FAIL = CallsTruth(
         count=5,
