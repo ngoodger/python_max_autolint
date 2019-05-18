@@ -25,7 +25,7 @@ def test_black_check_unformatted(unformatted_filename):
     Test python black correctly reports change required for unformatted code.
     """
     files = {
-        unformatted_filename: max_autolint.File(
+        unformatted_filename: max_autolint.FileSet(
             path=unformatted_filename,
             checker_failures=set(),
             checker_errors=set(),
@@ -49,7 +49,7 @@ def test_black_modify_unformatted(unformatted_filename):
     Test python black correctly reformats unformatted code.
     """
     files = {
-        unformatted_filename: max_autolint.File(
+        unformatted_filename: max_autolint.FileSet(
             path=unformatted_filename,
             checker_failures=set(),
             checker_errors=set(),
@@ -58,10 +58,10 @@ def test_black_modify_unformatted(unformatted_filename):
             modifier_failures=set(),
         )
     }
-    black = max_autolint.Black(files, modifier=True)
+    black_modifier = max_autolint.BlackModifier(files)
     # Start black.
-    black()
-    while not black.done():
+    black_modifier()
+    while not black_modifier.done():
         # Wait until done.
         pass
     assert files[unformatted_filename].modifier_applied == {"Black"}

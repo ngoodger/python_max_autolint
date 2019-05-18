@@ -15,7 +15,6 @@ class FileSet:
     modifier_failures: set
     syntax_error: bool = None
 
-
 def check_error(file):
     pass
 
