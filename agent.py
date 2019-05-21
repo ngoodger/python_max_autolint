@@ -3,13 +3,16 @@ import time
 import math
 
 class Agent:
+    """
+    Orchestrates file set modification / checking.
+    """
     def __init__(self, file_collector, syntax, modifiers, checkers):
         self.file_collector = file_collector
         self.syntax = syntax
         self.modifiers = modifier 
         self.checkers = checkers 
 
-    def __call__(self):
+    def __call__(self, check_only: bool):
 
         # Collect files for checking and modification.
         files = self.file_collector()
@@ -22,7 +25,7 @@ class Agent:
 
         # Apply modifiers.
         for modifier in self.modifiers:
-            modifier_return = modifier(files)
+            modifier_return = modifier(files, check_only)
             if modifier_return.error:
                 return modifier_return
             print(f"modifier elapsed_time {modifier_return.elapsed_time_ms}ms")
