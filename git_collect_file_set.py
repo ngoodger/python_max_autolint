@@ -10,7 +10,7 @@ class GitCollectFileSet:
         """
         self.repo = Repo(working_tree_dir)
 
-    def collect(self):
+    def __call__(self):
         """
         Description:
             collect changed files in project.

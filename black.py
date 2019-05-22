@@ -1,26 +1,27 @@
-import FileOperator
+import file_operator
+from enum import Enum
 
-class ModifierReturnCodes(Enum):
-    SUCCESS = 0
-
-class CheckerReturnCodes(Enum):
-    SUCCESS = 0
-    ERROR = 1
-
-class BlackModifier(FileOperator)
+class BlackModifier(file_operator.FileOperator):
     def base_cmd(self):
         return ["black"]
 
     @property
-    def return_code(self):
-        return ModifierReturnCodes
+    def success_return_int(self):
+        return 0
+
+    @property
+    def error_return_int(self):
+        return 1
         
 
-class BlackCheck(FileOperator)
+class BlackCheck(file_operator.FileOperator):
     def base_cmd(self):
         return ["black", "--check"]
 
     @property
-    def return_code(self):
-        return CheckerReturnCodes
+    def success_return_int(self):
+        return 0
 
+    @property
+    def error_return_int(self):
+        return 1

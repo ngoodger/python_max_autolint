@@ -1,6 +1,6 @@
 from file_operator import FileOperator, SubProcessReturnCode
 
-class Syntax(FileOperator)
+class Flake8(FileOperator):
 
     @property
     def base_cmd(self):

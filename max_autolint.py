@@ -4,22 +4,30 @@ import black
 import flake8
 import syntax
 import git_collect_file_set
+import logging
+import sys
+
+logging.getLogger(__name__)
 
 def main(path: str, check_only: bool):
     file_collector = git_collect_file_set.GitCollectFileSet(path)
 
     my_flake8 = flake8.Flake8()
-    my_black= black.Black()
+    my_black= black.BlackChecker if check_only else black.BlackModifier()
 
     my_syntax = syntax.Syntax()
     checkers = [flake8]
-    modifiers = [my_black] 
+    modifiers = [my_black]
 
     my_agent = agent.Agent(file_collector=file_collector, syntax=my_syntax,
                            checkers=checkers, modifiers=modifiers)
-    my_agent(check_only)
+    result = my_agent()
+    # If result is not None.  Indicative of issue. Output std_out and std_error.
+    if result is not None:
+        sys.stdout.write(result.std_out)
+        sys.stderr.write(result.std_error)
 
-def dir_path(path):
+def dir_path(path: str):
     if os.path.isdir(path):
         return path
     else:

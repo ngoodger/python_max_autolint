@@ -1,13 +1,15 @@
-import FileOperator
+import file_operator
+from enum import Enum
 
-class CheckerReturnCodes(Enum):
-    SUCCESS = 0
-    ERROR = 1
-
-class Syntax(FileOperator)
+class Syntax(file_operator.FileOperator):
+    @property
     def base_cmd(self):
         return ["python3","-m","pycompile"]
 
     @property
-    def return_code(self):
-        return CheckerReturnCodes
+    def success_return_int(self):
+        return 0
+
+    @property
+    def error_return_int(self):
+        return 1
