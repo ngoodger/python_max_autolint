@@ -4,7 +4,7 @@ from enum import Enum
 class Syntax(file_operator.FileOperator):
     @property
     def base_cmd(self):
-        return ["python3","-m","pycompile"]
+        return ["python3","-m","py_compile"]
 
     @property
     def success_return_int(self):

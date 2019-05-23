@@ -36,6 +36,6 @@ def test_init(repo_with_init_commit):
 
 def test_collect_files(repo_with_2_files_staged_for_commit):
     dut = git_collect_file_set.GitCollectFileSet(repo_with_2_files_staged_for_commit)
-    files = dut.collect()
+    files = dut()
     assert "new_file0.py" in files[0], "new_file0.py should be staged for commit."
     assert "new_file1.py" in files[1], "new_file1.py should be staged for commit."

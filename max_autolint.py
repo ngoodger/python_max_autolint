@@ -6,19 +6,23 @@ import syntax
 import git_collect_file_set
 import logging
 import sys
+import os
 
-logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
-def main(path: str, check_only: bool):
+def main(path: str, check_only: bool, debug: bool):
+    if debug:
+        logger.basicConfig(level=logging.DEBUG)
+    logger.debug('This will get logged')
     file_collector = git_collect_file_set.GitCollectFileSet(path)
 
     my_flake8 = flake8.Flake8()
     my_black= black.BlackChecker if check_only else black.BlackModifier()
 
     my_syntax = syntax.Syntax()
-    checkers = [flake8]
+    checkers = [my_flake8]
     modifiers = [my_black]
-
+    
     my_agent = agent.Agent(file_collector=file_collector, syntax=my_syntax,
                            checkers=checkers, modifiers=modifiers)
     result = my_agent()
@@ -35,11 +39,16 @@ def dir_path(path: str):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Process some integers.")
-    parser.add_argument('-path', type=dir_path, help="Root directory to perform modification / checking.")
+    parser.add_argument('path', type=dir_path, help="Root directory to perform modification / checking.")
     parser.add_argument(
         "--check_only",
         action="store_true",
         help="Only check if changes would be applied not actually apply them.",
     )
+    parser.add_argument(
+        "--debug",
+        action="store_true",
+        help="Print debug log to stdout",
+    )
     args = parser.parse_args()
-    main(args.path, args.check_only)
+    main(args.path, args.check_only, args.debug)

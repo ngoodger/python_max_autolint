@@ -2,6 +2,7 @@ import file_operator
 from enum import Enum
 
 class BlackModifier(file_operator.FileOperator):
+    @property
     def base_cmd(self):
         return ["black"]
 
@@ -15,6 +16,7 @@ class BlackModifier(file_operator.FileOperator):
         
 
 class BlackCheck(file_operator.FileOperator):
+    @property
     def base_cmd(self):
         return ["black", "--check"]
 
