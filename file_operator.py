@@ -27,7 +27,7 @@ class FileOperator(ABC):
 
     def __call__(self, files: List[str]):
         start_time = time.time()
-        SLEEP_TIME_SEC = 0.01
+        SLEEP_TIME_SEC = 0.00
         self.proc = sp.Popen(
             self.base_cmd + files,
             stdout=sp.PIPE,
