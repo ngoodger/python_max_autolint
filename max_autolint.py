@@ -8,12 +8,10 @@ import logging
 import sys
 import os
 
-logger = logging.getLogger(__name__)
-
 def main(path: str, check_only: bool, debug: bool):
     if debug:
-        logger.basicConfig(level=logging.DEBUG)
-    logger.debug('This will get logged')
+        logging.basicConfig(level=logging.DEBUG)
+    logger = logging.getLogger(__name__)
     file_collector = git_collect_file_set.GitCollectFileSet(path)
 
     my_flake8 = flake8.Flake8()
