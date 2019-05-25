@@ -3,7 +3,7 @@ import agent
 import time
 import math
 from unittest.mock import Mock, Mock
-from file_operator import FileOperatorReturn 
+from file_operator import FileOperatorReturn
 import pytest
 
 
@@ -18,8 +18,9 @@ class AgentMock(agent.Agent):
     # Override init function to replace components with mocks
     def __init__(self):
         self.file_collector = Mock(return_value="test_file.py")
-        return_code = FileOperatorReturn(error=False, std_out="std_out",
-        std_error="std_error", elapsed_time_ms=100)
+        return_code = FileOperatorReturn(
+            error=False, std_out="std_out", std_error="std_error", elapsed_time_ms=100
+        )
         self.parent_mock = Mock(return_value=return_code)
         self.parent_mock.syntax = Mock(return_value=return_code)
         self.parent_mock.modifier_0 = Mock(return_value=return_code)
@@ -35,8 +36,10 @@ class AgentMockSyntaxFail(AgentMock):
     def __init__(self):
         super(AgentMockSyntaxFail, self).__init__()
         self.parent_mock.syntax.return_value = FileOperatorReturn(
-            error=True, elapsed_time_ms=10, std_out="std_out_error_syntax",
-            std_error="std_error_error_syntax"
+            error=True,
+            elapsed_time_ms=10,
+            std_out="std_out_error_syntax",
+            std_error="std_error_error_syntax",
         )
 
 
@@ -44,8 +47,10 @@ class AgentMockModifierFail(AgentMock):
     def __init__(self):
         super(AgentMockModifierFail, self).__init__()
         self.parent_mock.modifier_0.return_value = FileOperatorReturn(
-            error=True, elapsed_time_ms=10, std_out="std_out_error_modifier_0",
-                                std_error="std_error_error_modifier_0"
+            error=True,
+            elapsed_time_ms=10,
+            std_out="std_out_error_modifier_0",
+            std_error="std_error_error_modifier_0",
         )
 
 
@@ -53,8 +58,10 @@ class AgentMockCheckerFail(AgentMock):
     def __init__(self):
         super(AgentMockCheckerFail, self).__init__()
         self.parent_mock.checker_0.return_value = FileOperatorReturn(
-            error=True, elapsed_time_ms=10, std_out="std_out_error_checker_0",
-            std_error="std_error_error_checker_0"
+            error=True,
+            elapsed_time_ms=10,
+            std_out="std_out_error_checker_0",
+            std_error="std_error_error_checker_0",
         )
 
 
@@ -90,6 +97,7 @@ def test_timeit():
         return_test.elapsed_time_ms, SLEEP_MS + 1
     ), "Execution time measured does not match expected in test."
 """
+
 
 def test_agent_syntax_fail():
     """

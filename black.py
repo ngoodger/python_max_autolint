@@ -1,6 +1,7 @@
 import file_operator
 from enum import Enum
 
+
 class BlackModifier(file_operator.FileOperator):
     @property
     def base_cmd(self):
@@ -13,7 +14,7 @@ class BlackModifier(file_operator.FileOperator):
     @property
     def error_return_int(self):
         return 1
-        
+
 
 class BlackChecker(file_operator.FileOperator):
     @property
