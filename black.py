@@ -15,7 +15,7 @@ class BlackModifier(file_operator.FileOperator):
         return 1
         
 
-class BlackCheck(file_operator.FileOperator):
+class BlackChecker(file_operator.FileOperator):
     @property
     def base_cmd(self):
         return ["black", "--check"]

@@ -17,7 +17,7 @@ def main(path: str, check_only: bool, debug: bool):
     file_collector = git_collect_file_set.GitCollectFileSet(path)
 
     my_flake8 = flake8.Flake8()
-    my_black= black.BlackChecker if check_only else black.BlackModifier()
+    my_black= black.BlackChecker() if check_only else black.BlackModifier()
 
     my_syntax = syntax.Syntax()
     checkers = [my_flake8]
