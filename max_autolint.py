@@ -12,7 +12,8 @@ def main(path: str, check_only: bool, debug: bool):
     if debug:
         logging.basicConfig(level=logging.DEBUG)
     logger = logging.getLogger(__name__)
-    file_collector = git_collect_file_set.GitCollectFileSet(path)
+    #file_collector = git_collect_file_set.GitCollectFileSet(path)
+    file_collector = git_collect_file_set.GitCollectTrackedFileSet(path)
 
     my_flake8 = flake8.Flake8()
     my_black= black.BlackChecker() if check_only else black.BlackModifier()
