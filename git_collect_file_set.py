@@ -42,7 +42,6 @@ class GitCollectTrackedFileSet:
         }
         # Filter files with .py extension
         py_extension_files = {file for file in tracked_files if file[-3:] == ".py"}
-        print(py_extension_files)
         # Find files with python shebang
         non_py_extension_files = tracked_files - py_extension_files
         py_shebang_files = []
