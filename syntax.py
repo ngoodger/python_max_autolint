@@ -1,5 +1,4 @@
 import file_operator
-from enum import Enum
 
 
 class Syntax(file_operator.FileOperator):

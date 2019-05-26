@@ -1,10 +1,7 @@
 from dataclasses import dataclass
 import agent
-import time
-import math
-from unittest.mock import Mock, Mock
+from unittest.mock import Mock
 from file_operator import FileOperatorReturn
-import pytest
 
 
 @dataclass
@@ -114,7 +111,7 @@ def test_agent_syntax_fail():
 
 def test_agent_modifier_fail():
     """
-    Test agent on file containing modifier_0 error. 
+    Test agent on file containing modifier_0 error.
     """
     test_agent = AgentMockModifierFail()
     TEST_OUT_MODIFIER_FAIL = CallsTruth(
@@ -129,7 +126,7 @@ def test_agent_modifier_fail():
 
 def test_agent_checker_fail():
     """
-    Test agent on file containing checker_0 error. 
+    Test agent on file containing checker_0 error.
     """
     test_agent = AgentMockCheckerFail()
     TEST_OUT_CHECKER_FAIL = CallsTruth(
@@ -146,7 +143,7 @@ def test_agent_checker_fail():
 
 def test_agent_no_fail():
     """
-    Test agent on file containing no errors. 
+    Test agent on file containing no errors.
     """
     test_agent = AgentMock()
     TEST_OUT_NO_FAIL = CallsTruth(

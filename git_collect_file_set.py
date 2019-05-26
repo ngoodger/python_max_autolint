@@ -15,7 +15,7 @@ class GitCollectFileSet:
         Description:
             collect changed files in project.
         Returns:
-            files (List[str]): List of full path files that are staged for commit. 
+            files (List[str]): List of full path files that are staged for commit.
         """
         diffs = self.repo.index.diff(self.repo.head.commit)
         files = [os.path.join(self.repo.working_dir, diff.a_path) for diff in diffs]
@@ -35,7 +35,7 @@ class GitCollectTrackedFileSet:
         Description:
             collect changed files in project.
         Returns:
-            files (List[str]): List of full path files that are staged for commit. 
+            files (List[str]): List of full path files that are staged for commit.
         """
         tracked_files = {
             blob.abspath for blob in self.repo.heads.master.commit.tree.blobs

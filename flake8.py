@@ -1,5 +1,4 @@
-from file_operator import FileOperator, SubProcessReturnCode
-import tempfile
+from file_operator import FileOperator
 
 
 class Flake8(FileOperator):

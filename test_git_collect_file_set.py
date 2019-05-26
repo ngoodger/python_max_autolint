@@ -6,7 +6,6 @@ from git import Repo
 
 @pytest.fixture
 def repo_with_init_commit(tmp_path):
-    TEST_REPO_NAME = "test_repo"
     repo = Repo.init(tmp_path, bare=False)
     empty_filename = os.path.join(tmp_path, "empty_file.txt")
     with open(empty_filename, "w") as f:
@@ -31,7 +30,7 @@ def repo_with_2_files_staged_for_commit(repo_with_init_commit):
 
 def test_init(repo_with_init_commit):
     # Ensure no exceptions are raised on init.
-    dut = git_collect_file_set.GitCollectFileSet(repo_with_init_commit)
+    dut = git_collect_file_set.GitCollectFileSet(repo_with_init_commit)  # noqa F841
 
 
 def test_collect_files(repo_with_2_files_staged_for_commit):

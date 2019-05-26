@@ -29,6 +29,7 @@ def main(path: str, check_only: bool, debug: bool):
         checkers=checkers,
         modifiers=modifiers,
     )
+    logger.debug(f"Starting max autolint now..")
     result = my_agent()
     # If result is not None.  Indicative of issue. Output std_out and std_error.
     if result is not None:

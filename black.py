@@ -1,5 +1,4 @@
 import file_operator
-from enum import Enum
 
 
 class BlackModifier(file_operator.FileOperator):
