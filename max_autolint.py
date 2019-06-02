@@ -1,12 +1,11 @@
 import argparse
 import agent
-import black
-import flake8
-import syntax
+import ops
 import git_collect_file_set
 import logging
 import sys
 import os
+import file_set
 
 
 def main(path: str, check_only: bool, debug: bool):
@@ -15,19 +14,19 @@ def main(path: str, check_only: bool, debug: bool):
     logger = logging.getLogger(__name__)
     # file_collector = git_collect_file_set.GitCollectFileSet(path)
     file_collector = git_collect_file_set.GitCollectTrackedFileSet(path)
+    # Collect files for checking and modification.
+    files = file_collector()
+    logger.debug(f"Files to check: {files}")
 
-    my_flake8 = flake8.Flake8()
-    my_black = black.BlackChecker() if check_only else black.BlackModifier()
-
-    my_syntax = syntax.Syntax()
-    checkers = [my_flake8]
-    modifiers = [my_black]
+    my_syntax = ops.Syntax()
+    my_flake8 = ops.Flake8()
+    my_black = ops.BlackChecker() if check_only else ops.BlackModifier()
+    ops_set = {my_syntax, my_flake8, my_black}
+    my_file_set = file_set.FileSet(files, ops_to_run=ops_set) 
 
     my_agent = agent.Agent(
-        file_collector=file_collector,
-        syntax=my_syntax,
-        checkers=checkers,
-        modifiers=modifiers,
+        file_set = my_file_set,
+        ops = ops_set,
     )
     logger.debug(f"Starting max autolint now..")
     result = my_agent()

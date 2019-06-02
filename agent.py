@@ -1,7 +1,18 @@
 import logging
+from dataclasses import dataclass
+import time
 
 # logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
+
+@dataclass
+class FileSet:
+    files: list 
+    syntax_run: set
+    checkers_run: set
+    modifiers_run: set
+    good: bool
+    lock: bool
 
 
 class Agent:
@@ -9,24 +20,29 @@ class Agent:
     Orchestrates file set modification / checking.
     """
 
-    def __init__(self, file_collector, syntax, modifiers, checkers):
-        self.file_collector = file_collector
-        self.syntax = syntax
-        self.modifiers = modifiers
-        self.checkers = checkers
+    def __init__(self, ops, file_set):
+        self.file_set = file_set
+        self.ops = ops
 
     def __call__(self):
 
         # Collect files for checking and modification.
-        files = self.file_collector()
-        logger.debug(f"Files to check: {files}")
+        logger.debug(f"Files to check: {self.file_set}")
 
         # Only run tools if there is actually something to run them on.
-        if len(files) == 0:
+        if len(self.file_set) == 0:
+            logger.info("No files to check.")
             return
 
-        # Check syntax.
-        syntax_return = self.syntax(files)
+        while not self.file_set.good:
+            self.file_set.update(self.ops)
+            time.sleep(0.01)
+            
+        """
+        # Call check syntax.
+        ops.syntax(files)
+        # Wait until check syntax is finished.
+        syntax_return = self.syntax.wait_done()
         if syntax_return.error:
             return syntax_return
         logger.debug(
@@ -35,7 +51,10 @@ class Agent:
 
         # Apply modifiers.
         for modifier in self.modifiers:
-            modifier_return = modifier(files)
+            # Call modifier.
+            modifier(files)
+            # Wait until modifier is done.
+            modifier_return = modifier.wait_done()
             if modifier_return.error:
                 return modifier_return
             logger.debug(
@@ -44,9 +63,13 @@ class Agent:
 
         # Check checkers.
         for checker in self.checkers:
-            checker_return = checker(files)
+            # Call checker.
+            checker(files)
+            # Wait until checker is done.
+            checker_return = checker.wait_done()
             if checker_return.error:
                 return checker_return
             logger.debug(
                 f"{checker.__class__} elapsed_time {checker_return.elapsed_time_ms}ms"
             )
+        """

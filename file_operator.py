@@ -6,6 +6,7 @@ from typing import List
 import subprocess as sp
 import math
 
+MS_IN_SECOND = 1000
 
 @dataclass
 class FileOperatorReturn:
@@ -24,19 +25,19 @@ class SubProcessReturnCode(Enum):
     FAIL = 2
 
 
-MS_IN_SECOND = 1000
-
-
 class FileOperator(ABC):
     def __call__(self, files: List[str]):
-        start_time = time.time()
-        SLEEP_TIME_SEC = 0.01
+        self.start_time = time.time()
         self.proc = sp.Popen(
             self.base_cmd + files,
             stdout=sp.PIPE,
             stderr=sp.PIPE,
             universal_newlines=True,
         )
+
+    """
+    def wait_done(self):
+        SLEEP_TIME_SEC = 0.01
         # Wait until done.
         proc_done = self.check_done()
         while not proc_done:
@@ -44,16 +45,8 @@ class FileOperator(ABC):
             proc_done = self.check_done()
 
         # Now we are done get elapsed time and build result.
-        end_time = time.time()
-        elapsed_time_ms = math.ceil((end_time - start_time) * MS_IN_SECOND)
+    """
 
-        result = FileOperatorReturn(
-            error=not self.return_code == SubProcessReturnCode.SUCCESS,
-            std_out=self.std_out,
-            std_error=self.std_error,
-            elapsed_time_ms=elapsed_time_ms,
-        )
-        return result
 
     def check_done(self):
         proc_done = not self.proc.poll() is None
@@ -61,7 +54,23 @@ class FileOperator(ABC):
         if proc_done:
             self.std_out, self.std_error = self.proc.communicate(timeout=1)
             self.return_code = self.return_code_lookup(self.proc.returncode)
+            self.end_time = time.time()
+            self.elapsed_time_ms = math.ceil((self.end_time - self.start_time) * MS_IN_SECOND)
         return proc_done
+
+    def get_result(self):
+        result = FileOperatorReturn(
+            error= not self.return_code == SubProcessReturnCode.SUCCESS,
+            std_out=self.std_out,
+            std_error=self.std_error,
+            elapsed_time_ms=self.elapsed_time_ms,
+        )
+        return result
+
+    @property
+    @abstractmethod
+    def locking(self):
+        pass
 
     @property
     @abstractmethod
