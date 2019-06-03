@@ -7,11 +7,16 @@ class FileSet:
     """
     def __init__(self, files: List[str], ops_to_run):
         self.files = files
-        self.good = False
+        self.finished = False
         self.locked = False
         self.running_ops = set()
         self.finished_ops = set()
         self.ops_to_run = ops_to_run
+        self.highest_reporting_priority = 99 # Lowest priorty. 
+        # Find highest reporting priority op.
+        for op in ops_to_run:
+            if op.reporting_priority < self.highest_reporting_priority:
+                self.highest_reporting_priority = op.reporting_priority
 
     def update(self, ops=[]):
         for op in ops:
@@ -19,7 +24,9 @@ class FileSet:
             # 1. file_set not locked already by running op. 
             # 2. op not already running or has already been run.
             # 3. op is not locking (can run concurrently) or there are no running ops so it is ok start and lock. 
-            if not self.locked and op not in (self.running_ops or self.finished_ops) and (not op.locking or len(self.running_ops) == 0):
+            # 4. not op of higher reporting priority has already failed
+            if (not self.locked and op not in (self.running_ops or self.finished_ops) and
+                (not op.locking or len(self.running_ops) == 0) and not self.finished):
                 # Locking operation should lock the fileset to prevent any other ops from running.
                 if op.locking:
                     self.locked = True 
@@ -38,22 +45,34 @@ class FileSet:
                 self.finished_ops.add(op)
         
         self.check_finished()
+        if self.finished:
+            pass
+            # TODO terminate ops.
 
     def check_finished(self):
-        error_ops = [] 
+        # Finished if no higher reporting priority op is yet to finish than one that already has an error.
         for op in self.finished_ops:
-            if op.get_result().error:
-                error_ops.append(op)
-        for error_op in error_ops:
-            result = error_op.get_result
-            sys.stdout.write(result.std_out)
-            sys.stderr.write(result.std_error)
-            raise Exception
+            if op.result.error and self.highest_reporting_priority >= op.reporting_priority:
+                self.finished = True
+        # Finished if all ope
         if self.finished_ops == self.ops_to_run:
-            self.good = True
+            self.finished = True
 
     def __len__(self):
         return len(self.files)
 
     def __repr__(self):
         return str(self.files)
+
+def report(ops):
+    error_op = None 
+    for op in ops: 
+        if op.result is not None and op.result.error:
+            if error_op is None or error_op.reporting_priority > op.reporting_priority:
+                error_op = op
+    if error_op is not None:
+        sys.stdout.write(f"{str(error_op)}\n")
+        result = error_op.result
+        sys.stdout.write(result.std_out)
+        sys.stderr.write(result.std_error)
+        raise Exception

@@ -26,6 +26,9 @@ class SubProcessReturnCode(Enum):
 
 
 class FileOperator(ABC):
+    def __init__(self):
+        self.result = None
+
     def __call__(self, files: List[str]):
         self.start_time = time.time()
         self.proc = sp.Popen(
@@ -56,16 +59,13 @@ class FileOperator(ABC):
             self.return_code = self.return_code_lookup(self.proc.returncode)
             self.end_time = time.time()
             self.elapsed_time_ms = math.ceil((self.end_time - self.start_time) * MS_IN_SECOND)
+            self.result = FileOperatorReturn(
+                error= not self.return_code == SubProcessReturnCode.SUCCESS,
+                std_out=self.std_out,
+                std_error=self.std_error,
+                elapsed_time_ms=self.elapsed_time_ms,
+            )
         return proc_done
-
-    def get_result(self):
-        result = FileOperatorReturn(
-            error= not self.return_code == SubProcessReturnCode.SUCCESS,
-            std_out=self.std_out,
-            std_error=self.std_error,
-            elapsed_time_ms=self.elapsed_time_ms,
-        )
-        return result
 
     @property
     @abstractmethod
@@ -87,6 +87,14 @@ class FileOperator(ABC):
     def error_return_int(self):
         pass
 
+    @property
+    @abstractmethod
+    def reporting_priority(self):
+        """
+        Used for prioritising return messages. Lower is higher priority. 
+        """
+        pass
+
     def return_code_lookup(self, return_code: int):
         if return_code == self.success_return_int:
             return SubProcessReturnCode.SUCCESS
@@ -94,3 +102,6 @@ class FileOperator(ABC):
             return SubProcessReturnCode.ERROR
         else:
             return SubProcessReturnCode.FAIL
+
+    def __repr__(self):
+        return str(type(self).__name__)

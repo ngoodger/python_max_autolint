@@ -15,6 +15,9 @@ class Syntax(file_operator.FileOperator):
     @property
     def locking(self):
         return False 
+    @property
+    def reporting_priority(self):
+        return 0
 
 class BlackModifier(file_operator.FileOperator):
 
@@ -30,6 +33,9 @@ class BlackModifier(file_operator.FileOperator):
     @property
     def locking(self):
         return True 
+    @property
+    def reporting_priority(self):
+        return 1
 
 
 
@@ -48,6 +54,9 @@ class BlackChecker(file_operator.FileOperator):
     @property
     def locking(self):
         return False
+    @property
+    def reporting_priority(self):
+        return 1
 
 class Flake8(file_operator.FileOperator):
 
@@ -71,3 +80,6 @@ class Flake8(file_operator.FileOperator):
     @property
     def locking(self):
         return False 
+    @property
+    def reporting_priority(self):
+        return 2

@@ -1,6 +1,7 @@
 import logging
 from dataclasses import dataclass
 import time
+import file_set
 
 # logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
@@ -32,11 +33,12 @@ class Agent:
         # Only run tools if there is actually something to run them on.
         if len(self.file_set) == 0:
             logger.info("No files to check.")
-            return
-
-        while not self.file_set.good:
+            return 
+        while not self.file_set.finished:
             self.file_set.update(self.ops)
             time.sleep(0.01)
+
+        file_set.report(self.ops)
             
         """
         # Call check syntax.
