@@ -8,6 +8,7 @@ import math
 
 MS_IN_SECOND = 1000
 
+
 @dataclass
 class FileOperatorReturn:
     error: bool
@@ -50,7 +51,6 @@ class FileOperator(ABC):
         # Now we are done get elapsed time and build result.
     """
 
-
     def check_done(self):
         proc_done = not self.proc.poll() is None
         # If process is finished update file properties according to stdout and stderr.
@@ -58,9 +58,11 @@ class FileOperator(ABC):
             self.std_out, self.std_error = self.proc.communicate(timeout=1)
             self.return_code = self.return_code_lookup(self.proc.returncode)
             self.end_time = time.time()
-            self.elapsed_time_ms = math.ceil((self.end_time - self.start_time) * MS_IN_SECOND)
+            self.elapsed_time_ms = math.ceil(
+                (self.end_time - self.start_time) * MS_IN_SECOND
+            )
             self.result = FileOperatorReturn(
-                error= not self.return_code == SubProcessReturnCode.SUCCESS,
+                error=not self.return_code == SubProcessReturnCode.SUCCESS,
                 std_out=self.std_out,
                 std_error=self.std_error,
                 elapsed_time_ms=self.elapsed_time_ms,
@@ -89,9 +91,14 @@ class FileOperator(ABC):
 
     @property
     @abstractmethod
+    def run_first(self):
+        pass
+
+    @property
+    @abstractmethod
     def reporting_priority(self):
         """
-        Used for prioritising return messages. Lower is higher priority. 
+        Used for prioritising return messages. Lower is higher priority.
         """
         pass
 
