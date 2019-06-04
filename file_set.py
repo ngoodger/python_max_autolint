@@ -1,5 +1,8 @@
 import sys
 from typing import List
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class FileSet:
@@ -20,30 +23,37 @@ class FileSet:
             if op.reporting_priority < self.highest_reporting_priority:
                 self.highest_reporting_priority = op.reporting_priority
 
-    def update(self, ops=[]):
-        for op in ops:
+    def update(self, op=None):
+
+        if op is not None:
             # Only run op if:
             # 1. file_set not locked already by running op.
-            # 2. op not already running or has already been run.
+            # 2. op not already running and not has already been run.
             # 3. op is not locking (can run concurrently) or there are no running ops so it is ok start and lock.
             # 4. ops that must be run first has not already finished or is not part of run.
             # 4. not already finished.
+            logger.debug(f"run first: {op.run_first}")
+            logger.debug(f"Running ops: {self.running_ops}")
+            logger.debug(f"Finished ops: {self.finished_ops}")
+            # breakpoint()
             if (
                 not self.locked
-                and op not in (self.running_ops or self.finished_ops)
+                and ((op not in self.running_ops) and (op not in self.finished_ops))
                 and (not op.locking or len(self.running_ops) == 0)
                 and (
-                    op.run_first.issubset({type(op) in self.finished_ops})
-                    or not op.run_first.issubset({type(op) in self.ops_to_run})
+                    op.run_first.issubset({type(op) for op in self.finished_ops})
+                    or not op.run_first.issubset({type(op) for op in self.ops_to_run})
                 )
                 and not self.finished
             ):
+                # breakpoint()
                 # Locking operation should lock the fileset to prevent any other ops from running.
                 if op.locking:
                     self.locked = True
                 op(self.files)
                 self.running_ops.add(op)
 
+        logger.debug(f"Finished ops: {self.finished_ops}")
         # Copy running_ops set to list to avoid changing size while iterating through each op.
         running_ops_temp = list(self.running_ops)
         # Check state

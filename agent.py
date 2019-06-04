@@ -35,9 +35,15 @@ class Agent:
         if len(self.file_set) == 0:
             logger.info("No files to check.")
             return
-        while not self.file_set.finished:
-            self.file_set.update(self.ops)
-            time.sleep(0.01)
+        while True:
+            for op in self.ops:
+                print(op)
+                self.file_set.update(op)
+                if self.file_set.finished:
+                    break
+                time.sleep(0.1)
+            if self.file_set.finished:
+                break
 
         file_set.report(self.ops)
 

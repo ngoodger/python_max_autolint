@@ -1,4 +1,5 @@
 import time
+import logging
 from dataclasses import dataclass
 from enum import Enum
 from abc import ABC, abstractmethod
@@ -7,6 +8,8 @@ import subprocess as sp
 import math
 
 MS_IN_SECOND = 1000
+# logging.basicConfig(level=logging.DEBUG)
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -67,6 +70,7 @@ class FileOperator(ABC):
                 std_error=self.std_error,
                 elapsed_time_ms=self.elapsed_time_ms,
             )
+            logger.debug(f"{self.__class__} elapsed_time {self.elapsed_time_ms}ms")
         return proc_done
 
     @property
