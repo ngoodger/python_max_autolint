@@ -24,7 +24,7 @@ def main(path: str, check_only: bool, debug: bool):
     ops_set = {my_syntax, my_flake8, my_black}
     my_file_set = file_set.FileSet(files, ops_to_run=ops_set)
 
-    my_agent = agent.Agent(file_set=my_file_set, ops=ops_set)
+    my_agent = agent.OrderedAgent(file_set=my_file_set, ops=ops_set)
     logger.debug(f"Starting max autolint now..")
     result = my_agent()
     # If result is not None.  Indicative of issue. Output std_out and std_error.
