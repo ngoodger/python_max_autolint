@@ -1,6 +1,7 @@
 import logging
 from dataclasses import dataclass
 import time
+from abc import ABC, abstractmethod
 import file_set
 
 # logging.basicConfig(level=logging.DEBUG)
@@ -17,7 +18,7 @@ class FileSet:
     lock: bool
 
 
-class Agent:
+class Agent(ABC):
     """
     Orchestrates file set modification / checking.
     """
@@ -28,57 +29,52 @@ class Agent:
 
     def __call__(self):
 
-        # Collect files for checking and modification.
-        logger.debug(f"Files to check: {self.file_set}")
-
         # Only run tools if there is actually something to run them on.
         if len(self.file_set) == 0:
-            logger.info("No files to check.")
+            logger.debug("No files to check.")
             return
+
         while True:
             for op in self.ops:
-                print(op)
-                self.file_set.update(op)
+                action = self.choose_action(self.observe())
+                logger.debug(f"Action: {action}")
+                self.file_set.update(action)
                 if self.file_set.finished:
                     break
-                time.sleep(0.1)
+                time.sleep(0.01)
             if self.file_set.finished:
                 break
-
         file_set.report(self.ops)
 
-        """
-        # Call check syntax.
-        ops.syntax(files)
-        # Wait until check syntax is finished.
-        syntax_return = self.syntax.wait_done()
-        if syntax_return.error:
-            return syntax_return
-        logger.debug(
-            f"{self.syntax.__class__} elapsed_time {syntax_return.elapsed_time_ms}ms"
+    def observe(self):
+        observation = {
+            "ops_to_run": self.file_set.ops_to_run,
+            "running_ops": self.file_set.running_ops,
+            "finished_ops": self.file_set.finished_ops,
+        }
+        return observation
+
+    @abstractmethod
+    def choose_action(self, observation):
+        pass
+
+
+class OrderedAgent(Agent):
+    def choose_action(self, observation):
+        ops_to_run = observation["ops_to_run"]
+        running_ops = observation["running_ops"]
+        finished_ops = observation["finished_ops"]
+        non_running_or_finished_ops = ops_to_run - (running_ops | finished_ops)
+        locking_ops = [op for op in non_running_or_finished_ops if op.locking]
+        sorted_locking_ops = sorted(locking_ops, key=lambda x: x.reporting_priority)
+        non_locking_ops = [op for op in non_running_or_finished_ops if not op.locking]
+        sorted_non_locking_ops = sorted(
+            non_locking_ops, key=lambda x: x.reporting_priority
         )
-
-        # Apply modifiers.
-        for modifier in self.modifiers:
-            # Call modifier.
-            modifier(files)
-            # Wait until modifier is done.
-            modifier_return = modifier.wait_done()
-            if modifier_return.error:
-                return modifier_return
-            logger.debug(
-                f"{modifier.__class__} elapsed_time {modifier_return.elapsed_time_ms}ms"
-            )
-
-        # Check checkers.
-        for checker in self.checkers:
-            # Call checker.
-            checker(files)
-            # Wait until checker is done.
-            checker_return = checker.wait_done()
-            if checker_return.error:
-                return checker_return
-            logger.debug(
-                f"{checker.__class__} elapsed_time {checker_return.elapsed_time_ms}ms"
-            )
-        """
+        if len(sorted_locking_ops) > 0:
+            action = sorted_locking_ops[0]
+        elif len(non_locking_ops):
+            action = sorted_non_locking_ops[0]
+        else:
+            action = None
+        return action

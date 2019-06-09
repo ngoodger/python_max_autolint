@@ -32,9 +32,9 @@ class FileSet:
             # 3. op is not locking (can run concurrently) or there are no running ops so it is ok start and lock.
             # 4. ops that must be run first has not already finished or is not part of run.
             # 4. not already finished.
-            logger.debug(f"run first: {op.run_first}")
-            logger.debug(f"Running ops: {self.running_ops}")
-            logger.debug(f"Finished ops: {self.finished_ops}")
+            # logger.debug(f"run first: {op.run_first}")
+            # logger.debug(f"Running ops: {self.running_ops}")
+            # logger.debug(f"Finished ops: {self.finished_ops}")
             # breakpoint()
             if (
                 not self.locked
@@ -53,7 +53,7 @@ class FileSet:
                 op(self.files)
                 self.running_ops.add(op)
 
-        logger.debug(f"Finished ops: {self.finished_ops}")
+        # logger.debug(f"Finished ops: {self.finished_ops}")
         # Copy running_ops set to list to avoid changing size while iterating through each op.
         running_ops_temp = list(self.running_ops)
         # Check state
