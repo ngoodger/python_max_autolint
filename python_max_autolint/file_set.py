@@ -100,4 +100,4 @@ def report(ops):
         result = error_op.result
         sys.stdout.write(result.std_out)
         sys.stderr.write(result.std_error)
-        raise Exception
+        #raise Exception

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
-import agent
+from python_max_autolint import agent
 from unittest.mock import Mock
-from file_operator import FileOperatorReturn
+from python_max_autolint.file_operator import FileOperatorReturn
 import pytest
 
 

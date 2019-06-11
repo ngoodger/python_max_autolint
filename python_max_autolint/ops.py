@@ -1,4 +1,4 @@
-import file_operator
+from python_max_autolint import file_operator
 
 
 class Syntax(file_operator.FileOperator):
@@ -79,6 +79,75 @@ class BlackChecker(file_operator.FileOperator):
         return set()
 
 
+class IsortModifier(file_operator.FileOperator):
+    @property
+    def base_cmd(self):
+        return [
+            "isort",
+            "--multi-line=3",
+            "--trailing-comma",
+            "--force-grid-wrap=0",
+            "--combine-as",
+            "--line-width=88",
+            "-rc",
+        ]
+
+    @property
+    def success_return_int(self):
+        return 0
+
+    @property
+    def error_return_int(self):
+        return 1
+
+    @property
+    def locking(self):
+        return True
+
+    @property
+    def reporting_priority(self):
+        return 2
+
+    @property
+    def run_first(self):
+        return set()
+
+
+class IsortChecker(file_operator.FileOperator):
+    @property
+    def base_cmd(self):
+        return [
+            "isort",
+            "--multi-line=3",
+            "--trailing-comma",
+            "--force-grid-wrap=0",
+            "--combine-as",
+            "--line-width=88",
+            "-rc",
+            "--check-only",
+        ]
+
+    @property
+    def success_return_int(self):
+        return 0
+
+    @property
+    def error_return_int(self):
+        return 1
+
+    @property
+    def locking(self):
+        return False
+
+    @property
+    def reporting_priority(self):
+        return 3
+
+    @property
+    def run_first(self):
+        return set()
+
+
 class Flake8(file_operator.FileOperator):
     @property
     def base_cmd(self):
@@ -104,7 +173,7 @@ class Flake8(file_operator.FileOperator):
 
     @property
     def reporting_priority(self):
-        return 2
+        return 3
 
     @property
     def run_first(self):

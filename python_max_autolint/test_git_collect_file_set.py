@@ -1,5 +1,5 @@
 import pytest
-import git_collect_file_set
+from python_max_autolint import git_collect_file_set
 import os
 from git import Repo
 

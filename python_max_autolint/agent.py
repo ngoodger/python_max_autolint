@@ -2,7 +2,7 @@ import logging
 from dataclasses import dataclass
 import time
 from abc import ABC, abstractmethod
-import file_set
+from python_max_autolint import file_set
 
 # logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
