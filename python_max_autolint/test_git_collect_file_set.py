@@ -1,7 +1,9 @@
-import pytest
-from python_max_autolint import git_collect_file_set
 import os
+
+import pytest
 from git import Repo
+
+from python_max_autolint import git_collect_file_set
 
 
 @pytest.fixture

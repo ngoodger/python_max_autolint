@@ -1,7 +1,8 @@
 import logging
-from dataclasses import dataclass
 import time
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
+
 from python_max_autolint import file_set
 
 # logging.basicConfig(level=logging.DEBUG)

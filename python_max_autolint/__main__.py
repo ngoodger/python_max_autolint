@@ -1,12 +1,15 @@
 import argparse
-from  python_max_autolint import max_autolint
 import os
+
+from python_max_autolint import max_autolint
+
 
 def dir_path(path: str):
     if os.path.isdir(path):
         return path
     else:
         raise argparse.ArgumentTypeError(f"readable_dir:{path} is not a valid path")
+
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Process some integers.")

@@ -1,8 +1,10 @@
 from dataclasses import dataclass
-from python_max_autolint import agent
 from unittest.mock import Mock
-from python_max_autolint.file_operator import FileOperatorReturn
+
 import pytest
+
+from python_max_autolint import agent
+from python_max_autolint.file_operator import FileOperatorReturn
 
 
 @dataclass
@@ -95,6 +97,7 @@ def test_timeit():
         return_test.elapsed_time_ms, SLEEP_MS + 1
     ), "Execution time measured does not match expected in test."
 """
+
 
 @pytest.mark.skip(reason="Need to update this test to suit new agent.")
 def test_agent_syntax_fail():

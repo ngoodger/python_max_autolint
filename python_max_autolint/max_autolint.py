@@ -1,8 +1,7 @@
-import argparse
-from python_max_autolint import agent, git_collect_file_set, ops, file_set
 import logging
 import sys
-import os
+
+from python_max_autolint import agent, file_set, git_collect_file_set, ops
 
 
 def main(path: str, check_only: bool, debug: bool):
@@ -29,6 +28,3 @@ def main(path: str, check_only: bool, debug: bool):
     if result is not None:
         sys.stdout.write(result.std_out)
         sys.stderr.write(result.std_error)
-
-
-

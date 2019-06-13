@@ -1,11 +1,11 @@
-import time
 import logging
+import math
+import subprocess as sp
+import time
+from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from enum import Enum
-from abc import ABC, abstractmethod
 from typing import List
-import subprocess as sp
-import math
 
 MS_IN_SECOND = 1000
 # logging.basicConfig(level=logging.DEBUG)
