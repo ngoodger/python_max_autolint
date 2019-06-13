@@ -1,5 +1,6 @@
-from git import Repo
 import os
+
+from git import Repo
 
 
 class GitCollectFileSet:
@@ -22,6 +23,17 @@ class GitCollectFileSet:
         return files
 
 
+def get_all_trees(tree, trees=None):
+    if trees is None:
+        trees = {tree}
+    else:
+        trees.add(tree)
+    if len(tree.trees) > 0:
+        for sub_tree in tree.trees:
+            trees = get_all_trees(sub_tree, trees)
+    return trees
+
+
 class GitCollectTrackedFileSet:
     def __init__(self, working_tree_dir):
         """
@@ -37,9 +49,12 @@ class GitCollectTrackedFileSet:
         Returns:
             files (List[str]): List of full path files that are staged for commit.
         """
-        tracked_files = {
-            blob.abspath for blob in self.repo.heads.master.commit.tree.blobs
-        }
+        trees = get_all_trees(self.repo.heads.master.commit.tree)
+        all_blobs = []
+        for tree in trees:
+            all_blobs += tree.blobs
+
+        tracked_files = {blob.abspath for blob in all_blobs}
         # Filter files with .py extension
         py_extension_files = {file for file in tracked_files if file[-3:] == ".py"}
         # Find files with python shebang
