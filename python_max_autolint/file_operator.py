@@ -104,7 +104,6 @@ class FileOperator(ABC):
         """
         Used for prioritising return messages. Lower is higher priority.
         """
-        pass
 
     def return_code_lookup(self, return_code: int):
         if return_code == self.success_return_int:

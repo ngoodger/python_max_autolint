@@ -27,6 +27,58 @@ class Syntax(file_operator.FileOperator):
         return set()
 
 
+class AutoFlakeModifier(file_operator.FileOperator):
+    @property
+    def base_cmd(self):
+        return ["autoflake", "--in-place", "--remove-all-unused-imports"]
+
+    @property
+    def success_return_int(self):
+        return 0
+
+    @property
+    def error_return_int(self):
+        return 1
+
+    @property
+    def locking(self):
+        return True
+
+    @property
+    def reporting_priority(self):
+        return 3
+
+    @property
+    def run_first(self):
+        return set()
+
+
+class AutoFlakeChecker(file_operator.FileOperator):
+    @property
+    def base_cmd(self):
+        return ["autoflake", "--in-place", "--remove-all-unused-imports", "--check"]
+
+    @property
+    def success_return_int(self):
+        return 0
+
+    @property
+    def error_return_int(self):
+        return 1
+
+    @property
+    def locking(self):
+        return False
+
+    @property
+    def reporting_priority(self):
+        return 3
+
+    @property
+    def run_first(self):
+        return set()
+
+
 class BlackModifier(file_operator.FileOperator):
     @property
     def base_cmd(self):
