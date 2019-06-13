@@ -89,7 +89,6 @@ class IsortModifier(file_operator.FileOperator):
             "--force-grid-wrap=0",
             "--combine-as",
             "--line-width=88",
-            "-rc",
         ]
 
     @property
@@ -123,7 +122,6 @@ class IsortChecker(file_operator.FileOperator):
             "--force-grid-wrap=0",
             "--combine-as",
             "--line-width=88",
-            "-rc",
             "--check-only",
         ]
 
