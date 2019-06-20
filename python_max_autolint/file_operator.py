@@ -33,10 +33,10 @@ class FileOperator(ABC):
     def __init__(self):
         self.result = None
 
-    def __call__(self, files: List[str]):
+    def __call__(self, files: List[str], check=False):
         self.start_time = time.time()
         self.proc = sp.Popen(
-            self.base_cmd + files,
+            (self.check_cmd if check else self.modify_cmd) + files,
             stdout=sp.PIPE,
             stderr=sp.PIPE,
             universal_newlines=True,
@@ -75,12 +75,16 @@ class FileOperator(ABC):
 
     @property
     @abstractmethod
-    def locking(self):
+    def modifying(self):
         pass
 
     @property
     @abstractmethod
-    def base_cmd(self):
+    def check_cmd(self):
+        pass
+
+    @property
+    def modify_cmd(self):
         pass
 
     @property

@@ -66,16 +66,21 @@ class OrderedAgent(Agent):
         running_ops = observation["running_ops"]
         finished_ops = observation["finished_ops"]
         non_running_or_finished_ops = ops_to_run - (running_ops | finished_ops)
-        locking_ops = [op for op in non_running_or_finished_ops if op.locking]
-        sorted_locking_ops = sorted(locking_ops, key=lambda x: x.reporting_priority)
-        non_locking_ops = [op for op in non_running_or_finished_ops if not op.locking]
-        sorted_non_locking_ops = sorted(
-            non_locking_ops, key=lambda x: x.reporting_priority
+        modifying_ops = [op for op in non_running_or_finished_ops if op.modifying]
+        sorted_check_modifying = sorted(
+            modifying_ops, key=lambda x: x.reporting_priority
         )
-        if len(sorted_locking_ops) > 0:
-            action = sorted_locking_ops[0]
-        elif len(non_locking_ops):
-            action = sorted_non_locking_ops[0]
+        sorted_modifying_ops = sorted(modifying_ops, key=lambda x: x.reporting_priority)
+        non_modifying_ops = [
+            op for op in non_running_or_finished_ops if not op.modifying
+        ]
+        sorted_non_modifying_ops = sorted(
+            non_modifying_ops, key=lambda x: x.reporting_priority
+        )
+        if len(sorted_modifying_ops) > 0:
+            action = sorted_modifying_ops[0]
+        elif len(sorted_non_modifying_ops):
+            action = sorted_non_modifying_ops[0]
         else:
             action = None
         return action

@@ -10,13 +10,14 @@ class FileSet:
     Manages state of files and Protects files from invalid operations.
     """
 
-    def __init__(self, files: List[str], ops_to_run):
+    def __init__(self, files: List[str], ops_to_run, check_only):
         self.files = files
         self.finished = False
         self.locked = False
         self.running_ops = set()
         self.finished_ops = set()
         self.ops_to_run = ops_to_run
+        self.check_only = check_only
         self.highest_reporting_priority = 99  # Lowest priorty.
         # Find highest reporting priority op.
         for op in ops_to_run:
@@ -29,7 +30,7 @@ class FileSet:
             # Only run op if:
             # 1. file_set not locked already by running op.
             # 2. op not already running and not has already been run.
-            # 3. op is not locking (can run concurrently) or there are no running ops so it is ok start and lock.
+            # 3. op is not modifying (can run concurrently) or there are no running ops so it is ok start and lock.
             # 4. ops that must be run first has not already finished or is not part of run.
             # 4. not already finished.
             # logger.debug(f"run first: {op.run_first}")
@@ -39,7 +40,7 @@ class FileSet:
             if (
                 not self.locked
                 and ((op not in self.running_ops) and (op not in self.finished_ops))
-                and (not op.locking or len(self.running_ops) == 0)
+                and (not op.modifying or len(self.running_ops) == 0)
                 and (
                     op.run_first.issubset({type(op) for op in self.finished_ops})
                     or not op.run_first.issubset({type(op) for op in self.ops_to_run})
@@ -47,8 +48,8 @@ class FileSet:
                 and not self.finished
             ):
                 # breakpoint()
-                # Locking operation should lock the fileset to prevent any other ops from running.
-                if op.locking:
+                # Modifying operation should lock the fileset to prevent any other ops from running.
+                if op.modifying:
                     self.locked = True
                 op(self.files)
                 self.running_ops.add(op)
@@ -59,8 +60,8 @@ class FileSet:
         # Check state
         for op in running_ops_temp:
             if op.check_done():
-                # If op was locking it must have locked the fileset and can unlock it again since it is complete.
-                if op.locking:
+                # If op was modifying it must have locked the fileset and can unlock it again since it is complete.
+                if op.modifying:
                     self.locked = False
                 self.running_ops.remove(op)
                 self.finished_ops.add(op)

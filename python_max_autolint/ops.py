@@ -3,7 +3,7 @@ from python_max_autolint import file_operator
 
 class Syntax(file_operator.FileOperator):
     @property
-    def base_cmd(self):
+    def check_cmd(self):
         return ["python3", "-m", "py_compile"]
 
     @property
@@ -15,7 +15,7 @@ class Syntax(file_operator.FileOperator):
         return 1
 
     @property
-    def locking(self):
+    def modifying(self):
         return False
 
     @property
@@ -27,35 +27,13 @@ class Syntax(file_operator.FileOperator):
         return set()
 
 
-class AutoFlakeModifier(file_operator.FileOperator):
+class AutoFlake(file_operator.FileOperator):
     @property
-    def base_cmd(self):
+    def modify_cmd(self):
         return ["autoflake", "--in-place", "--remove-all-unused-imports"]
 
     @property
-    def success_return_int(self):
-        return 0
-
-    @property
-    def error_return_int(self):
-        return 1
-
-    @property
-    def locking(self):
-        return True
-
-    @property
-    def reporting_priority(self):
-        return 3
-
-    @property
-    def run_first(self):
-        return set()
-
-
-class AutoFlakeChecker(file_operator.FileOperator):
-    @property
-    def base_cmd(self):
+    def check_cmd(self):
         return ["autoflake", "--in-place", "--remove-all-unused-imports", "--check"]
 
     @property
@@ -67,8 +45,8 @@ class AutoFlakeChecker(file_operator.FileOperator):
         return 1
 
     @property
-    def locking(self):
-        return False
+    def modifying(self):
+        return True
 
     @property
     def reporting_priority(self):
@@ -79,35 +57,13 @@ class AutoFlakeChecker(file_operator.FileOperator):
         return set()
 
 
-class BlackModifier(file_operator.FileOperator):
+class Black(file_operator.FileOperator):
     @property
-    def base_cmd(self):
+    def modify_cmd(self):
         return ["black"]
 
     @property
-    def success_return_int(self):
-        return 0
-
-    @property
-    def error_return_int(self):
-        return 1
-
-    @property
-    def locking(self):
-        return True
-
-    @property
-    def reporting_priority(self):
-        return 1
-
-    @property
-    def run_first(self):
-        return set()
-
-
-class BlackChecker(file_operator.FileOperator):
-    @property
-    def base_cmd(self):
+    def check_cmd(self):
         return ["black", "--check"]
 
     @property
@@ -119,8 +75,8 @@ class BlackChecker(file_operator.FileOperator):
         return 1
 
     @property
-    def locking(self):
-        return False
+    def modifying(self):
+        return True
 
     @property
     def reporting_priority(self):
@@ -131,9 +87,9 @@ class BlackChecker(file_operator.FileOperator):
         return set()
 
 
-class IsortModifier(file_operator.FileOperator):
+class Isort(file_operator.FileOperator):
     @property
-    def base_cmd(self):
+    def modify_cmd(self):
         return [
             "isort",
             "--multi-line=3",
@@ -144,29 +100,7 @@ class IsortModifier(file_operator.FileOperator):
         ]
 
     @property
-    def success_return_int(self):
-        return 0
-
-    @property
-    def error_return_int(self):
-        return 1
-
-    @property
-    def locking(self):
-        return True
-
-    @property
-    def reporting_priority(self):
-        return 2
-
-    @property
-    def run_first(self):
-        return set()
-
-
-class IsortChecker(file_operator.FileOperator):
-    @property
-    def base_cmd(self):
+    def check_cmd(self):
         return [
             "isort",
             "--multi-line=3",
@@ -186,12 +120,12 @@ class IsortChecker(file_operator.FileOperator):
         return 1
 
     @property
-    def locking(self):
-        return False
+    def modifying(self):
+        return True
 
     @property
     def reporting_priority(self):
-        return 3
+        return 2
 
     @property
     def run_first(self):
@@ -200,7 +134,7 @@ class IsortChecker(file_operator.FileOperator):
 
 class Flake8(file_operator.FileOperator):
     @property
-    def base_cmd(self):
+    def check_cmd(self):
         return [
             "flake8",
             "--ignore=E203,E266,E501,W503",
@@ -218,7 +152,7 @@ class Flake8(file_operator.FileOperator):
         return 1
 
     @property
-    def locking(self):
+    def modifying(self):
         return False
 
     @property

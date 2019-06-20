@@ -16,11 +16,11 @@ def main(path: str, check_only: bool, debug: bool):
 
     my_syntax = ops.Syntax()
     my_flake8 = ops.Flake8()
-    my_autoflake = ops.AutoFlakeChecker() if check_only else ops.AutoFlakeModifier()
-    my_isort = ops.IsortChecker() if check_only else ops.IsortModifier()
-    my_black = ops.BlackChecker() if check_only else ops.BlackModifier()
+    my_autoflake = ops.AutoFlake()
+    my_isort = ops.Isort()
+    my_black = ops.Black()
     ops_set = {my_syntax, my_flake8, my_black, my_isort, my_autoflake}
-    my_file_set = file_set.FileSet(files, ops_to_run=ops_set)
+    my_file_set = file_set.FileSet(files, ops_to_run=ops_set, check_only=check_only)
 
     my_agent = agent.OrderedAgent(file_set=my_file_set, ops=ops_set)
     logger.debug(f"Starting max autolint now..")
