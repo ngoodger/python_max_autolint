@@ -42,18 +42,6 @@ class FileOperator(ABC):
             universal_newlines=True,
         )
 
-    """
-    def wait_done(self):
-        SLEEP_TIME_SEC = 0.01
-        # Wait until done.
-        proc_done = self.check_done()
-        while not proc_done:
-            time.sleep(SLEEP_TIME_SEC)
-            proc_done = self.check_done()
-
-        # Now we are done get elapsed time and build result.
-    """
-
     def check_done(self):
         proc_done = not self.proc.poll() is None
         # If process is finished update file properties according to stdout and stderr.
@@ -75,7 +63,7 @@ class FileOperator(ABC):
 
     @property
     @abstractmethod
-    def locking(self):
+    def modifying(self):
         pass
 
     @property

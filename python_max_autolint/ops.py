@@ -7,6 +7,10 @@ class Syntax(file_operator.FileOperator):
         return ["python3", "-m", "py_compile"]
 
     @property
+    def tool_name(self):
+        return "syntax"
+
+    @property
     def success_return_int(self):
         return 0
 
@@ -15,7 +19,7 @@ class Syntax(file_operator.FileOperator):
         return 1
 
     @property
-    def locking(self):
+    def modifying(self):
         return False
 
     @property
@@ -37,11 +41,15 @@ class AutoFlakeModifier(file_operator.FileOperator):
         return 0
 
     @property
+    def tool_name(self):
+        return "autoflake"
+
+    @property
     def error_return_int(self):
         return 1
 
     @property
-    def locking(self):
+    def modifying(self):
         return True
 
     @property
@@ -63,11 +71,15 @@ class AutoFlakeChecker(file_operator.FileOperator):
         return 0
 
     @property
+    def tool_name(self):
+        return "autoflake"
+
+    @property
     def error_return_int(self):
         return 1
 
     @property
-    def locking(self):
+    def modifying(self):
         return False
 
     @property
@@ -85,6 +97,10 @@ class BlackModifier(file_operator.FileOperator):
         return ["black"]
 
     @property
+    def tool_name(self):
+        return "black"
+
+    @property
     def success_return_int(self):
         return 0
 
@@ -93,7 +109,7 @@ class BlackModifier(file_operator.FileOperator):
         return 1
 
     @property
-    def locking(self):
+    def modifying(self):
         return True
 
     @property
@@ -111,6 +127,10 @@ class BlackChecker(file_operator.FileOperator):
         return ["black", "--check"]
 
     @property
+    def tool_name(self):
+        return "black"
+
+    @property
     def success_return_int(self):
         return 0
 
@@ -119,7 +139,7 @@ class BlackChecker(file_operator.FileOperator):
         return 1
 
     @property
-    def locking(self):
+    def modifying(self):
         return False
 
     @property
@@ -148,11 +168,15 @@ class IsortModifier(file_operator.FileOperator):
         return 0
 
     @property
+    def tool_name(self):
+        return "isort"
+
+    @property
     def error_return_int(self):
         return 1
 
     @property
-    def locking(self):
+    def modifying(self):
         return True
 
     @property
@@ -186,7 +210,11 @@ class IsortChecker(file_operator.FileOperator):
         return 1
 
     @property
-    def locking(self):
+    def tool_name(self):
+        return "isort"
+
+    @property
+    def modifying(self):
         return False
 
     @property
@@ -214,11 +242,15 @@ class Flake8(file_operator.FileOperator):
         return 0
 
     @property
+    def tool_name(self):
+        return "flake8"
+
+    @property
     def error_return_int(self):
         return 1
 
     @property
-    def locking(self):
+    def modifying(self):
         return False
 
     @property

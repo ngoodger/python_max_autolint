@@ -1,7 +1,14 @@
 import logging
 import sys
 
-from python_max_autolint import agent, file_set, git_collect_file_set, ops
+from python_max_autolint import (
+    agent,
+    file_set,
+    git_collect_file_set,
+    monitor,
+    ops_set,
+    runner,
+)
 
 
 def main(path: str, check_only: bool, debug: bool):
@@ -14,17 +21,16 @@ def main(path: str, check_only: bool, debug: bool):
     files = file_collector()
     logger.debug(f"Files to check: {files}")
 
-    my_syntax = ops.Syntax()
-    my_flake8 = ops.Flake8()
-    my_autoflake = ops.AutoFlakeChecker() if check_only else ops.AutoFlakeModifier()
-    my_isort = ops.IsortChecker() if check_only else ops.IsortModifier()
-    my_black = ops.BlackChecker() if check_only else ops.BlackModifier()
-    ops_set = {my_syntax, my_flake8, my_black, my_isort, my_autoflake}
-    my_file_set = file_set.FileSet(files, ops_to_run=ops_set)
+    my_ops_set = ops_set.OpsSet()
 
-    my_agent = agent.OrderedAgent(file_set=my_file_set, ops=ops_set)
+    my_monitor = monitor.Monitor(ops_set=my_ops_set)
+    my_file_set = file_set.FileSet(files=files, ops_set=my_ops_set)
+    my_agent = agent.ModifiersFirstAgent(ops_set=my_ops_set)
+    my_runner = runner.Runner(file_set=my_file_set, agent=my_agent, monitor=my_monitor)
+
+    result = my_runner()
+
     logger.debug(f"Starting max autolint now..")
-    result = my_agent()
     # If result is not None.  Indicative of issue. Output std_out and std_error.
     if result is not None:
         sys.stdout.write(result.std_out)
